@@ -1,0 +1,168 @@
+/* Ultimate Dice Roller Theme: Fantasy RPG x Modern Crypto */
+
+body {
+    background: linear-gradient(135deg, #232526 0%, #414345 100%);
+    color: #f3f3f3;
+    font-family: 'Inter', 'Roboto', Arial, sans-serif;
+}
+
+.navbar {
+    background: rgba(34, 40, 49, 0.98) !important;
+    border-bottom: 2px solid #6f42c1;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.navbar-brand, .navbar-nav .nav-link {
+    color: #f3f3f3 !important;
+    font-family: 'Cinzel', 'Inter', serif;
+    font-size: 1.35rem;
+    letter-spacing: 1px;
+}
+
+.navbar-brand .bi {
+    color: #ffd700;
+    font-size: 2rem;
+    margin-right: 0.5rem;
+    vertical-align: -0.2em;
+}
+
+h1, h2, h4, .fw-bold {
+    font-family: 'Cinzel', 'Inter', serif;
+    color: #ffd700;
+    letter-spacing: 1px;
+}
+
+.result-box, .alert-success, .alert-danger {
+    font-family: 'Fira Mono', 'Roboto Mono', monospace;
+    font-size: 1.15rem;
+}
+
+.card {
+    background: rgba(40, 44, 52, 0.97);
+    border: 1.5px solid #6f42c1;
+    border-radius: 1.2rem;
+    box-shadow: 0 4px 24px rgba(111, 66, 193, 0.08);
+    color: #ffd700;
+}
+
+.card .card-body {
+    color: #f3f3f3;
+}
+
+.table {
+    background: #35363a !important;
+    color: #f3f3f3 !important;
+    border-radius: 0.7rem;
+    overflow: hidden;
+}
+
+.table th, .table td {
+    background: #232526 !important;
+    color: #ffd700 !important;
+}
+
+.table th {
+    background: #6f42c1 !important;
+    color: #ffd700 !important;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 1px;
+    font-size: 1.08rem;
+    font-weight: 700;
+    border-bottom: 2px solid #ffd700;
+}
+
+.table td {
+    font-family: 'Fira Mono', 'Roboto Mono', monospace;
+    color: #f3f3f3 !important;
+    font-size: 1.06rem;
+}
+
+.table tbody tr:hover {
+    background: #444657 !important;
+}
+
+.table th {
+    background: #6f42c1;
+    color: #ffd700;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 1px;
+    font-size: 1.08rem;
+    font-weight: 700;
+    border-bottom: 2px solid #ffd700;
+}
+
+.table tbody tr {
+    background: #232526;
+    color: #f3f3f3;
+    transition: background 0.2s;
+}
+
+.table tbody tr:hover {
+    background: #444657;
+}
+
+.table td {
+    font-family: 'Fira Mono', 'Roboto Mono', monospace;
+    color: #f3f3f3;
+    font-size: 1.06rem;
+}
+
+.table a, .table a:visited {
+    color: #4ea3ff;
+    text-decoration: underline;
+    font-weight: 600;
+}
+
+.table a:hover {
+    color: #ffd700;
+}
+
+footer {
+    background: #232526 !important;
+    color: #ffd700 !important;
+    border-top: 2px solid #6f42c1;
+    font-size: 1.08rem;
+    z-index: 10;
+    position: relative;
+}
+
+.btn-primary {
+    background: linear-gradient(90deg, #6f42c1 0%, #ffd700 100%);
+    border: none;
+    color: #232526;
+    font-weight: bold;
+    letter-spacing: 1px;
+    box-shadow: 0 2px 8px rgba(111, 66, 193, 0.18);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(90deg, #ffd700 0%, #6f42c1 100%);
+    color: #232526;
+}
+
+input, select, textarea {
+    background: #232526;
+    color: #ffd700;
+    border: 1px solid #6f42c1;
+    border-radius: 0.4rem;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: #ffd700;
+    outline: none;
+    box-shadow: 0 0 0 2px #ffd70033;
+}
+
+.form-label, .form-text {
+    color: #ffd700;
+    font-family: 'Cinzel', serif;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    background: #232526;
+}
+::-webkit-scrollbar-thumb {
+    background: #6f42c1;
+    border-radius: 5px;
+}
