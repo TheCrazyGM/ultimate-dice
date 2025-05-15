@@ -1,67 +1,69 @@
 {% extends "base.html" %}
 {% block title %}Verify Dice Roll Proof{% endblock %}
 {% block content %}
-    <h2>Verify Dice Roll Proof</h2>
-    <form id="verifyForm" class="mb-4">
-            <div class="row mb-2">
-                <div class="col-md-4">
-                    <label class="form-label">Dice Type</label>
-                    <input type="text" class="form-control" name="dice_type" placeholder="e.g. d6" required>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Dice Count</label>
-                    <input type="number" class="form-control" name="dice_count" value="1" min="1" required>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Result (comma-separated)</label>
-                    <input type="text" class="form-control" name="result" placeholder="e.g. 3,5" required>
-                </div>
-            </div>
-            <div class="row mb-2">
-                <div class="col-md-4">
-                    <label class="form-label">Server Seed</label>
-                    <input type="text" class="form-control" name="server_seed" required>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Client Seed</label>
-                    <input type="text" class="form-control" name="client_seed" required>
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label">Nonce</label>
-                    <input type="number" class="form-control" name="nonce" value="0" required>
-                </div>
-            </div>
-            <div class="row mb-2">
-                <div class="col-md-6">
-                    <label class="form-label">Proof</label>
-                    <input type="text" class="form-control" name="proof" required>
-                </div>
-            </div>
-            <button type="submit" class="btn btn-primary">Verify Proof</button>
-        </form>
-        <div id="verifyFeedback"></div>
-        <a href="/" class="btn btn-secondary mt-3">Back to Roller</a>
+<h2>Verify Dice Roll Proof</h2>
+<form id="verifyForm" class="mb-4">
+    <div class="row mb-2">
+        <div class="col-md-4">
+            <label class="form-label">Dice Type</label>
+            <input type="text" class="form-control" name="dice_type" placeholder="e.g. d6" required>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Dice Count</label>
+            <input type="number" class="form-control" name="dice_count" value="1" min="1" required>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Result (comma-separated)</label>
+            <input type="text" class="form-control" name="result" placeholder="e.g. 3,5" required>
+        </div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-md-4">
+            <label class="form-label">Server Seed</label>
+            <input type="text" class="form-control" name="server_seed" required>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Client Seed</label>
+            <input type="text" class="form-control" name="client_seed" required>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Nonce</label>
+            <input type="number" class="form-control" name="nonce" value="0" required>
+        </div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-md-6">
+            <label class="form-label">Proof</label>
+            <input type="text" class="form-control" name="proof" required>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Verify Proof</button>
+</form>
+<div id="verifyFeedback"></div>
+<a href="/" class="btn btn-secondary mt-3">Back to Roller</a>
 {% endblock %}
 {% block scripts %}
-    <script>
-        document.getElementById('verifyForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const payload = Object.fromEntries(formData.entries());
-            payload.dice_count = parseInt(payload.dice_count);
-            payload.nonce = parseInt(payload.nonce);
-            payload.result = payload.result.split(',').map(x => x.trim());
-            const response = await fetch('/api/verify', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            const data = await response.json();
-            if (data.success) {
-                document.getElementById('verifyFeedback').innerHTML = `<div class='alert alert-success'>Proof Verified!<br>Recomputed Result: ${data.recomputed_result}</div>`;
-            } else {
-                document.getElementById('verifyFeedback').innerHTML = `<div class='alert alert-danger'>${data.message || 'Verification failed.'}</div>`;
-            }
+<script>
+    document.getElementById('verifyForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const payload = Object.fromEntries(formData.entries());
+        payload.dice_count = parseInt(payload.dice_count);
+        payload.nonce = parseInt(payload.nonce);
+        payload.result = payload.result.split(',').map(x => x.trim());
+        const response = await fetch('/api/verify', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
         });
-    </script>
+        const data = await response.json();
+        if (data.success) {
+            document.getElementById('verifyFeedback').innerHTML = `<div class='alert alert-success'>Proof Verified!<br>Recomputed Result: ${data.recomputed_result}</div>`;
+        } else {
+            document.getElementById('verifyFeedback').innerHTML = `<div class='alert alert-danger'>${data.message || 'Verification failed.'}</div>`;
+        }
+    });
+</script>
 {% endblock %}

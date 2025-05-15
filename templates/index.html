@@ -1,77 +1,101 @@
 {% extends "base.html" %}
 {% block title %}Ultimate Dice Roller{% endblock %}
 {% block content %}
-    <h1 class="mb-4 text-center">Ultimate Dice Roller</h1>
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <form id="rollForm" class="mb-4">
-                    <div class="input-group">
-                        <input type="text" id="quickRollInput" class="form-control" placeholder="e.g. 2d6+3" aria-label="Dice expression">
-                        <button type="submit" class="btn btn-primary">Quick Roll</button>
-                    </div>
-                    <div class="form-text">Format: <code>xdX+x</code> (e.g. 2d6+3, d20, 4d8-1, etc.)</div>
-                </form>
-                <div id="result" class="result-box text-center"></div>
+<h1 class="mb-4 text-center">Ultimate Dice Roller</h1>
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <form id="rollForm" class="mb-4">
+            <div class="input-group">
+                <input type="text" id="quickRollInput" class="form-control" placeholder="e.g. 2d6+3" aria-label="Dice expression">
+                <button type="submit" class="btn btn-primary">Quick Roll</button>
             </div>
-        </div>
-        <div class="row justify-content-center mt-4">
-            <div class="col-md-12">
-                <h4>Roll Dice</h4>
-                <div class="row" id="diceCards">
-                    <!-- Cards will be injected here -->
-                </div>
-            </div>
-        </div>
-        <div class="row justify-content-center mt-4">
-            <div class="col-md-10">
-                <h4>Last 10 Rolls</h4>
-                <div class="table-responsive">
-                    <table class="table table-striped" id="rollsTable">
-                        <thead>
-                            <tr>
-                                <th>Time</th>
-                                <th>Dice</th>
-                                <th>Result</th>
-                                <th>Modifier</th>
-                                <th>Label</th>
-                                <th>Proof</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for roll in rolls %}
-                            <tr>
-                                <td>{{ roll.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                                <td>{{ roll.dice_type }}</td>
-                                <td>{{ roll.roll_result }} (Total: {{ roll.roll_result.split(',')|map('int')|sum +
-                                    (roll.modifier or 0) }})</td>
-                                <td>{{ roll.modifier }}</td>
-                                <td>{{ roll.label or '' }}</td>
-                                <td><a href="/roll/{{ roll.id }}" >{{ roll.proof[:8] }}...</a></td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            <div class="form-text">Format: <code>xdX+x</code> (e.g. 2d6+3, d20, 4d8-1, etc.)</div>
+        </form>
+        <div id="result" class="result-box text-center"></div>
+    </div>
+</div>
+<div class="row justify-content-center mt-4">
+    <div class="col-md-12">
+        <h4>Roll Dice</h4>
+        <div class="row" id="diceCards">
+            <!-- Cards will be injected here -->
         </div>
     </div>
+</div>
+<div class="row justify-content-center mt-4">
+    <div class="col-md-10">
+        <h4>Last 10 Rolls</h4>
+        <div class="table-responsive">
+            <table class="table table-striped" id="rollsTable">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Dice</th>
+                        <th>Result</th>
+                        <th>Modifier</th>
+                        <th>Label</th>
+                        <th>Proof</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for roll in rolls %}
+                    <tr>
+                        <td>{{ roll.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td>{{ roll.dice_type }}</td>
+                        <td>{{ roll.roll_result }} (Total: {{ roll.roll_result.split(',')|map('int')|sum +
+                                    (roll.modifier or 0) }})</td>
+                        <td>{{ roll.modifier }}</td>
+                        <td>{{ roll.label or '' }}</td>
+                        <td><a href="/roll/{{ roll.id }}">{{ roll.proof[:8] }}...</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</div>
 
 {% endblock %}
 {% block scripts %}
-    <script>
-        // Dice types for cards
-        const diceTypes = [
-            { label: 'd4', sides: 4 },
-            { label: 'd6', sides: 6 },
-            { label: 'd8', sides: 8 },
-            { label: 'd10', sides: 10 },
-            { label: 'd12', sides: 12 },
-            { label: 'd20', sides: 20 },
-            { label: 'Custom', sides: null }
-        ];
-        function createDiceCard({ label, sides }) {
-            const id = `diceCard_${label}`;
-            return `
+<script>
+    // Dice types for cards
+    const diceTypes = [{
+            label: 'd4',
+            sides: 4
+        },
+        {
+            label: 'd6',
+            sides: 6
+        },
+        {
+            label: 'd8',
+            sides: 8
+        },
+        {
+            label: 'd10',
+            sides: 10
+        },
+        {
+            label: 'd12',
+            sides: 12
+        },
+        {
+            label: 'd20',
+            sides: 20
+        },
+        {
+            label: 'Custom',
+            sides: null
+        }
+    ];
+
+    function createDiceCard({
+        label,
+        sides
+    }) {
+        const id = `diceCard_${label}`;
+        return `
             <div class="col-lg-4 col-md-6 mb-3">
                 <div class="card shadow-sm h-100">
                     <div class="card-body d-flex flex-column justify-content-between">
@@ -92,70 +116,71 @@
                 </div>
             </div>
             `;
-        }
-        // Render cards
-        document.addEventListener('DOMContentLoaded', function () {
-            const diceCards = document.getElementById('diceCards');
-            diceCards.innerHTML = diceTypes.map(createDiceCard).join('');
-        });
-        // Form handler for all dice cards
-        document.addEventListener('submit', async function (e) {
-            if (e.target.classList.contains('diceRollForm')) {
-                e.preventDefault();
-                const form = e.target;
-                const formData = new FormData(form);
-                let diceType = form.getAttribute('data-label');
-                let diceCount = parseInt(formData.get('count'));
-                let modifier = parseInt(formData.get('modifier')) || 0;
-                let label = formData.get('label') || '';
-                let sides = form.getAttribute('data-sides');
-                if (diceType === 'Custom') {
-                    sides = parseInt(formData.get('custom_sides'));
-                    diceType = `d${sides}`;
-                }
-                else {
-                    sides = parseInt(sides);
-                    diceType = `d${sides}`;
-                }
-                const payload = {
-                    dice_type: diceType,
-                    dice_count: diceCount,
-                    modifier: modifier,
-                    label: label
-                };
-                const response = await fetch('/api/roll', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const data = await response.json();
-                const id = `diceCard_${form.getAttribute('data-label')}`;
-                if (data.success) {
-                    let total = data.result.reduce((a, b) => a + parseInt(b), 0) + modifier;
-                    document.getElementById(`result_${id}`).innerHTML = `
+    }
+    // Render cards
+    document.addEventListener('DOMContentLoaded', function() {
+        const diceCards = document.getElementById('diceCards');
+        diceCards.innerHTML = diceTypes.map(createDiceCard).join('');
+    });
+    // Form handler for all dice cards
+    document.addEventListener('submit', async function(e) {
+        if (e.target.classList.contains('diceRollForm')) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            let diceType = form.getAttribute('data-label');
+            let diceCount = parseInt(formData.get('count'));
+            let modifier = parseInt(formData.get('modifier')) || 0;
+            let label = formData.get('label') || '';
+            let sides = form.getAttribute('data-sides');
+            if (diceType === 'Custom') {
+                sides = parseInt(formData.get('custom_sides'));
+                diceType = `d${sides}`;
+            } else {
+                sides = parseInt(sides);
+                diceType = `d${sides}`;
+            }
+            const payload = {
+                dice_type: diceType,
+                dice_count: diceCount,
+                modifier: modifier,
+                label: label
+            };
+            const response = await fetch('/api/roll', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+            const data = await response.json();
+            const id = `diceCard_${form.getAttribute('data-label')}`;
+            if (data.success) {
+                let total = data.result.reduce((a, b) => a + parseInt(b), 0) + modifier;
+                document.getElementById(`result_${id}`).innerHTML = `
                         <div class='alert alert-success'>
                             <b>Rolls:</b> [${data.result.join(', ')}] ${modifier !== 0 ? (modifier > 0 ? "+" : "") + modifier : ''}<br>
                             <b>Total:</b> ${total} <br>
                             <b>Proof:</b> <a href="/roll/${data.roll_id}" >${data.proof.slice(0, 8)}...</a>
                         </div>
                     `;
-                    await refreshRollsTable();
-                } else {
-                    document.getElementById(`result_${id}`).innerHTML = `<div class='alert alert-danger'>${data.message}</div>`;
-                }
+                await refreshRollsTable();
+            } else {
+                document.getElementById(`result_${id}`).innerHTML = `<div class='alert alert-danger'>${data.message}</div>`;
             }
-        });
-        async function refreshRollsTable() {
-            const response = await fetch('/api/rolls');
-            const rolls = await response.json();
-            const tbody = document.querySelector('#rollsTable tbody');
-            tbody.innerHTML = rolls.map(roll => {
-                // Calculate total
-                let total = 0;
-                if (roll.roll_result) {
-                    total = roll.roll_result.split(',').map(x => parseInt(x)).reduce((a, b) => a + b, 0) + (roll.modifier || 0);
-                }
-                return `
+        }
+    });
+    async function refreshRollsTable() {
+        const response = await fetch('/api/rolls');
+        const rolls = await response.json();
+        const tbody = document.querySelector('#rollsTable tbody');
+        tbody.innerHTML = rolls.map(roll => {
+            // Calculate total
+            let total = 0;
+            if (roll.roll_result) {
+                total = roll.roll_result.split(',').map(x => parseInt(x)).reduce((a, b) => a + b, 0) + (roll.modifier || 0);
+            }
+            return `
                 <tr>
                     <td>${new Date(roll.timestamp).toLocaleString()}</td>
                     <td>${roll.dice_type}</td>
@@ -165,36 +190,54 @@
                     <td><a href="/roll/${roll.id}" >${roll.proof.slice(0, 8)}...</a></td>
                 </tr>
                 `;
-            }).join('');
+        }).join('');
+    }
+    document.getElementById('rollForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const input = document.getElementById('quickRollInput').value.trim();
+        // Parse input: e.g. 2d6+3, d20, 4d8-1, d10, etc.
+        const regex = /^(\d*)d(\d+)([+-]\d+)?$/i;
+        const match = input.match(regex);
+        if (!match) {
+            document.getElementById('result').innerHTML = `<div class='alert alert-danger'>Invalid format. Use xdX+x, e.g. 2d6+3 or d20</div>`;
+            return;
         }
-        document.getElementById('rollForm').addEventListener('submit', async function (e) {
-            e.preventDefault();
-            const input = document.getElementById('quickRollInput').value.trim();
-            // Parse input: e.g. 2d6+3, d20, 4d8-1, d10, etc.
-            const regex = /^(\d*)d(\d+)([+-]\d+)?$/i;
-            const match = input.match(regex);
-            if (!match) {
-                document.getElementById('result').innerHTML = `<div class='alert alert-danger'>Invalid format. Use xdX+x, e.g. 2d6+3 or d20</div>`;
-                return;
-            }
-            let diceCount = match[1] ? parseInt(match[1]) : 1;
-            let diceType = 'd' + match[2];
-            let modifier = match[3] ? parseInt(match[3]) : 0;
-            const response = await fetch('/api/roll', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ dice_type: diceType, dice_count: diceCount, modifier: modifier })
-            });
-            const data = await response.json();
-            if (data.success) {
-                document.getElementById('result').innerHTML = `<div class='alert alert-success'>Result: ${data.result} <br> Proof: <a href="/roll/${data.roll_id}" >${data.proof.slice(0, 8)}...</a></div>`;
-                await refreshRollsTable();
-            } else {
-                document.getElementById('result').innerHTML = `<div class='alert alert-danger'>${data.message}</div>`;
-            }
+        let diceCount = match[1] ? parseInt(match[1]) : 1;
+        let diceType = 'd' + match[2];
+        let modifier = match[3] ? parseInt(match[3]) : 0;
+        const response = await fetch('/api/roll', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                dice_type: diceType,
+                dice_count: diceCount,
+                modifier: modifier
+            })
         });
+        const data = await response.json();
+        if (data.success) {
+            let summation = data.result.join(', ');
+            let total = data.result.reduce((a, b) => a + parseInt(b), 0) + modifier;
+            let diceExpr = `${diceCount}d${diceType.replace('d','')}${modifier !== 0 ? (modifier > 0 ? '+' : '') + modifier : ''}`;
+            document.getElementById('result').innerHTML = `
+    <div class='alert alert-success text-center'>
+        <div style="font-family: 'Cinzel', serif; font-size: 1.15em; margin-bottom: 0.5em;">
+            <b>${diceExpr}</b>
+        </div>
+        <div><b>Rolls:</b> [${summation}]${modifier !== 0 ? ` <b>Modifier:</b> ${modifier > 0 ? '+' : ''}${modifier}` : ''}</div>
+        <div><b>Total:</b> <span style="font-family: 'Fira Mono', monospace;">${total}</span></div>
+        <div><b>Proof:</b> <a href="/roll/${data.roll_id}">${data.proof.slice(0, 8)}...</a></div>
+    </div>
+`;
+            await refreshRollsTable();
+        } else {
+            document.getElementById('result').innerHTML = `<div class='alert alert-danger'>${data.message}</div>`;
+        }
+    });
 
-        // Initial load
-        refreshRollsTable();
-    </script>
+    // Initial load
+    refreshRollsTable();
+</script>
 {% endblock %}

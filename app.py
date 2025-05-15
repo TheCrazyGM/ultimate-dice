@@ -2,20 +2,23 @@ import hashlib
 import hmac
 import secrets
 from datetime import datetime
+
+from bson.objectid import ObjectId
 from flask import Flask, jsonify, render_template, request
 from pymongo import MongoClient
-from bson.objectid import ObjectId
 
 # Connect to MongoDB
-mongo_client = MongoClient('mongodb://localhost:27017/')
-db = mongo_client['ultimate_dice']
-rolls_collection = db['dice_rolls']
+mongo_client = MongoClient("mongodb://localhost:27017/")
+db = mongo_client["ultimate_dice"]
+rolls_collection = db["dice_rolls"]
 
 app = Flask(__name__)
+
 
 @app.route("/verify")
 def verify_page():
     return render_template("proof_verify.html")
+
 
 # Helper to roll dice
 DICE_SIDES = {"d4": 4, "d6": 6, "d8": 8, "d10": 10, "d12": 12, "d20": 20, "d100": 100}
@@ -48,51 +51,62 @@ def provably_fair_roll(dice_type, dice_count, server_seed, client_seed, nonce):
 @app.route("/")
 def index():
     # Show last 10 rolls (most recent first)
-    rolls = list(rolls_collection.find().sort('timestamp', -1).limit(10))
+    rolls = list(rolls_collection.find().sort("timestamp", -1).limit(10))
     for roll in rolls:
-        roll['id'] = str(roll['_id'])
+        roll["id"] = str(roll["_id"])
     return render_template("index.html", rolls=rolls)
 
 
 @app.route("/api/rolls", methods=["GET"])
 def api_rolls():
     # Return last 10 rolls as JSON
-    rolls = list(rolls_collection.find().sort('timestamp', -1).limit(10))
-    return jsonify([
-        {
-            "id": str(r['_id']),
-            "dice_type": r['dice_type'],
-            "roll_result": r['roll_result'],
-            "proof": r['proof'],
-            "timestamp": r['timestamp'].isoformat(),
-            "server_seed": r['server_seed'],
-            "client_seed": r['client_seed'],
-            "nonce": r['nonce'],
-            "modifier": r['modifier'],
-            "label": r['label']
-        }
-        for r in rolls
-    ])
+    rolls = list(rolls_collection.find().sort("timestamp", -1).limit(10))
+    return jsonify(
+        [
+            {
+                "id": str(r["_id"]),
+                "dice_type": r["dice_type"],
+                "roll_result": r["roll_result"],
+                "proof": r["proof"],
+                "timestamp": r["timestamp"].isoformat(),
+                "server_seed": r["server_seed"],
+                "client_seed": r["client_seed"],
+                "nonce": r["nonce"],
+                "modifier": r["modifier"],
+                "label": r["label"],
+            }
+            for r in rolls
+        ]
+    )
 
 
 @app.route("/roll/<string:roll_id>")
 def roll_detail(roll_id):
-    roll = rolls_collection.find_one({'_id': ObjectId(roll_id)})
+    roll = rolls_collection.find_one({"_id": ObjectId(roll_id)})
     if roll is None:
         return jsonify({"success": False, "message": "Roll not found"}), 404
     # Recompute result and proof for verification
     try:
         recomputed_result, recomputed_proof = provably_fair_roll(
-            roll['dice_type'].split('x')[-1],
-            int(roll['dice_type'].split('x')[0]) if 'x' in roll['dice_type'] else 1,
-            roll['server_seed'],
-            roll['client_seed'],
-            roll['nonce']
+            roll["dice_type"].split("x")[-1],
+            int(roll["dice_type"].split("x")[0]) if "x" in roll["dice_type"] else 1,
+            roll["server_seed"],
+            roll["client_seed"],
+            roll["nonce"],
         )
     except Exception as e:
-        recomputed_result, recomputed_proof = [], f'Error: {e}'
-    verified = (recomputed_proof == roll['proof'] and ','.join(map(str, recomputed_result)) == roll['roll_result'])
-    return render_template("roll_detail.html", roll=roll, verified=verified, recomputed_result=recomputed_result, recomputed_proof=recomputed_proof)
+        recomputed_result, recomputed_proof = [], f"Error: {e}"
+    verified = (
+        recomputed_proof == roll["proof"]
+        and ",".join(map(str, recomputed_result)) == roll["roll_result"]
+    )
+    return render_template(
+        "roll_detail.html",
+        roll=roll,
+        verified=verified,
+        recomputed_result=recomputed_result,
+        recomputed_proof=recomputed_proof,
+    )
 
 
 @app.route("/api/roll", methods=["POST"])
@@ -123,7 +137,7 @@ def api_roll():
         "nonce": nonce,
         "modifier": modifier,
         "label": label,
-        "timestamp": datetime.utcnow()
+        "timestamp": datetime.utcnow(),
     }
     inserted = rolls_collection.insert_one(roll_doc)
     roll_id = str(inserted.inserted_id)
@@ -135,7 +149,7 @@ def api_roll():
             "server_seed": server_seed,
             "client_seed": client_seed,
             "nonce": nonce,
-            "roll_id": roll_id
+            "roll_id": roll_id,
         }
     )
 

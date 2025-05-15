@@ -9,10 +9,11 @@ body {
 .navbar {
     background: rgba(34, 40, 49, 0.98) !important;
     border-bottom: 2px solid #6f42c1;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-.navbar-brand, .navbar-nav .nav-link {
+.navbar-brand,
+.navbar-nav .nav-link {
     color: #f3f3f3 !important;
     font-family: 'Cinzel', 'Inter', serif;
     font-size: 1.35rem;
@@ -26,13 +27,18 @@ body {
     vertical-align: -0.2em;
 }
 
-h1, h2, h4, .fw-bold {
+h1,
+h2,
+h4,
+.fw-bold {
     font-family: 'Cinzel', 'Inter', serif;
     color: #ffd700;
     letter-spacing: 1px;
 }
 
-.result-box, .alert-success, .alert-danger {
+.result-box,
+.alert-success,
+.alert-danger {
     font-family: 'Fira Mono', 'Roboto Mono', monospace;
     font-size: 1.15rem;
 }
@@ -56,7 +62,8 @@ h1, h2, h4, .fw-bold {
     overflow: hidden;
 }
 
-.table th, .table td {
+.table th,
+.table td {
     background: #232526 !important;
     color: #ffd700 !important;
 }
@@ -107,7 +114,8 @@ h1, h2, h4, .fw-bold {
     font-size: 1.06rem;
 }
 
-.table a, .table a:visited {
+.table a,
+.table a:visited {
     color: #4ea3ff;
     text-decoration: underline;
     font-weight: 600;
@@ -140,20 +148,25 @@ footer {
     color: #232526;
 }
 
-input, select, textarea {
+input,
+select,
+textarea {
     background: #232526;
     color: #ffd700;
     border: 1px solid #6f42c1;
     border-radius: 0.4rem;
 }
 
-input:focus, select:focus, textarea:focus {
+input:focus,
+select:focus,
+textarea:focus {
     border-color: #ffd700;
     outline: none;
     box-shadow: 0 0 0 2px #ffd70033;
 }
 
-.form-label, .form-text {
+.form-label,
+.form-text {
     color: #ffd700;
     font-family: 'Cinzel', serif;
 }
@@ -162,6 +175,7 @@ input:focus, select:focus, textarea:focus {
     width: 10px;
     background: #232526;
 }
+
 ::-webkit-scrollbar-thumb {
     background: #6f42c1;
     border-radius: 5px;
