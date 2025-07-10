@@ -158,16 +158,18 @@ def api_roll():
                 int(block_data.get("id")) if block_data.get("id") is not None else None
             )
             server_seed = block_data.get("block_id") or secrets.token_hex(16)
-            client_seed = block_data.get(
+            client_seed_base = block_data.get(
                 "transaction_merkle_root"
             ) or secrets.token_hex(8)
+            salt = secrets.token_hex(4)  # 8-hex-char per-request salt
+            client_seed = f"{client_seed_base}{salt}"
         except Exception as e:
             print(f"Hive fetch error: {e}")
             server_seed = secrets.token_hex(16)
-            client_seed = secrets.token_hex(8)
+            client_seed = f"{secrets.token_hex(8)}{secrets.token_hex(4)}"
     else:
         server_seed = secrets.token_hex(16)
-        client_seed = secrets.token_hex(8)
+        client_seed = f"{secrets.token_hex(8)}{secrets.token_hex(4)}"
     nonce = block_num or 0
     logging.info(
         f"Using seeds - server: {server_seed}, client: {client_seed}, nonce: {nonce}"
