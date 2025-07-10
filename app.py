@@ -1,5 +1,6 @@
 import hashlib
 import hmac
+import logging
 import secrets
 from datetime import datetime
 
@@ -7,12 +8,32 @@ from bson.objectid import ObjectId
 from flask import Flask, jsonify, render_template, request
 from pymongo import MongoClient
 
+logging.basicConfig(level=logging.INFO)
+
+# Blockchain access via Hive Nectar
+try:
+    from nectar.blockchain import (
+        Blockchain,
+    )  # hive-nectar package mirrors beem.blockchain
+except ImportError:
+    # Fallback in case import name differs or package missing
+    Blockchain = None
+
+
 # Connect to MongoDB
 mongo_client = MongoClient("mongodb://localhost:27017/")
 db = mongo_client["ultimate_dice"]
 rolls_collection = db["dice_rolls"]
 
 app = Flask(__name__)
+
+# Initialize blockchain interface if available
+blockchain = None
+if Blockchain is not None:
+    try:
+        blockchain = Blockchain()
+    except Exception as e:
+        print(f"Warning: Failed to initialize Hive blockchain interface: {e}")
 
 
 @app.route("/verify")
@@ -74,6 +95,7 @@ def api_rolls():
                 "nonce": r["nonce"],
                 "modifier": r["modifier"],
                 "label": r["label"],
+                "block_num": r.get("block_num"),
             }
             for r in rolls
         ]
@@ -118,10 +140,38 @@ def api_roll():
         return jsonify({"success": False, "message": "Unsupported dice type"}), 400
     if not (1 <= dice_count <= 20):
         return jsonify({"success": False, "message": "Dice count must be 1-20"}), 400
-    # For demo: generate random server_seed and client_seed per roll
-    server_seed = secrets.token_hex(16)
-    client_seed = secrets.token_hex(8)
-    nonce = 0
+    # Generate seeds from Hive blockchain if available
+    block_num = None
+    if blockchain is not None:
+        try:
+            latest_block = blockchain.get_current_block()
+            block_data = (
+                latest_block.as_json()
+                if hasattr(latest_block, "as_json")
+                else dict(latest_block)
+            )
+            logging.info(f"Fetched latest Hive block object: {latest_block}")
+            logging.info(f"Block data keys: {list(block_data.keys())}")
+            # logging.info(f"Block data: {block_data}")
+            # Common field names – adjust if Nectar differs
+            block_num = (
+                int(block_data.get("id")) if block_data.get("id") is not None else None
+            )
+            server_seed = block_data.get("block_id") or secrets.token_hex(16)
+            client_seed = block_data.get(
+                "transaction_merkle_root"
+            ) or secrets.token_hex(8)
+        except Exception as e:
+            print(f"Hive fetch error: {e}")
+            server_seed = secrets.token_hex(16)
+            client_seed = secrets.token_hex(8)
+    else:
+        server_seed = secrets.token_hex(16)
+        client_seed = secrets.token_hex(8)
+    nonce = block_num or 0
+    logging.info(
+        f"Using seeds - server: {server_seed}, client: {client_seed}, nonce: {nonce}"
+    )
     results, proof = provably_fair_roll(
         dice_type, dice_count, server_seed, client_seed, nonce
     )
@@ -136,6 +186,7 @@ def api_roll():
         "client_seed": client_seed,
         "nonce": nonce,
         "modifier": modifier,
+        "block_num": block_num,
         "label": label,
         "timestamp": datetime.utcnow(),
     }
@@ -149,6 +200,7 @@ def api_roll():
             "server_seed": server_seed,
             "client_seed": client_seed,
             "nonce": nonce,
+            "block_num": block_num,
             "roll_id": roll_id,
         }
     )

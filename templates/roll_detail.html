@@ -1,60 +1,76 @@
 {% extends "base.html" %}
 {% block title %}Roll Proof Details{% endblock %}
 {% block content %}
-<h2>Roll Proof Details</h2>
-<table class="table table-bordered mt-3">
+  <h2>Roll Proof Details</h2>
+  <table class="table table-bordered mt-3">
     <tr>
-        <th>Time</th>
-        <td>{{ roll.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+      <th>Time</th>
+      <td>{{ roll.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
     </tr>
     <tr>
-        <th>Dice</th>
-        <td>{{ roll.dice_type }}</td>
+      <th>Dice</th>
+      <td>{{ roll.dice_type }}</td>
     </tr>
     <tr>
-        <th>Result</th>
-        <td>{{ roll.roll_result }}</td>
+      <th>Result</th>
+      <td>{{ roll.roll_result }}</td>
     </tr>
     <tr>
-        <th>Modifier</th>
-        <td>{{ roll.modifier }}</td>
+      <th>Modifier</th>
+      <td>{{ roll.modifier }}</td>
     </tr>
     <tr>
-        <th>Label</th>
-        <td>{{ roll.label or '' }}</td>
+      <th>Label</th>
+      <td>{{ roll.label or '' }}</td>
     </tr>
     <tr>
-        <th>Proof</th>
-        <td><code>{{ roll.proof }}</code></td>
+      <th>Proof</th>
+      <td><code>{{ roll.proof }}</code></td>
     </tr>
     <tr>
-        <th>Server Seed</th>
-        <td><code>{{ roll.server_seed }}</code></td>
+      <th>Server Seed</th>
+      <td><code>{{ roll.server_seed }}</code></td>
     </tr>
     <tr>
-        <th>Client Seed</th>
-        <td><code>{{ roll.client_seed }}</code></td>
+      <th>Client Seed</th>
+      <td><code>{{ roll.client_seed }}</code></td>
     </tr>
     <tr>
-        <th>Nonce</th>
-        <td>{{ roll.nonce }}</td>
+      <th>Nonce</th>
+      <td>{{ roll.nonce }}</td>
     </tr>
-</table>
-<h4>Verification</h4>
-{% set roll_list = roll.roll_result.split(',')|map('int')|list %}
-{% set total = roll_list|sum + (roll.modifier or 0) %}
-<div class="mb-2">
+    <tr>
+      <th>Seed Source</th>
+      <td>
+        Server Seed = block_id, Client Seed = transaction_merkle_root of Hive
+        block {{ roll.block_num }}
+      </td>
+    </tr>
+  </table>
+  <h4>Verification</h4>
+  {% set roll_list = roll.roll_result.split(',')|map('int')|list %}
+  {% set total = roll_list|sum + (roll.modifier or 0) %}
+  <div class="mb-2">
     <b>Summation:</b>
     [{{ roll_list|join(', ') }}]
     {% if roll.modifier %}
-    {% if roll.modifier > 0 %} + {{ roll.modifier }} {% elif roll.modifier < 0 %} - {{ -roll.modifier }} {% endif %}
+      {% if roll.modifier > 0 %}
+        + {{ roll.modifier }}
+      {% elif roll.modifier < 0 %}
+        - {{ -roll.modifier }}
+      {% endif %}
     {% endif %}
     = <b>{{ total }}</b>
-</div>
-{% if verified %}
-<div class="alert alert-success">Proof Verified!<br>Recomputed Result: {{ recomputed_result }}</div>
-{% else %}
-<div class="alert alert-danger">Verification failed.<br>Recomputed: {{ recomputed_result }}<br>Proof: {{ recomputed_proof }}</div>
-{% endif %}
-<a href="/" class="btn btn-secondary mt-3">Back to Roller</a>
+  </div>
+  {% if verified %}
+    <div class="alert alert-success">
+      Proof Verified!<br />Recomputed Result: {{ recomputed_result }}
+    </div>
+  {% else %}
+    <div class="alert alert-danger">
+      Verification failed.<br />Recomputed: {{ recomputed_result }}<br />Proof:
+      {{ recomputed_proof }}
+    </div>
+  {% endif %}
+  <a href="/" class="btn btn-secondary mt-3">Back to Roller</a>
 {% endblock %}
