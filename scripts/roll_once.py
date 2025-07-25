@@ -15,7 +15,7 @@ from datetime import datetime
 import dataset
 import requests
 
-API_URL = "http://localhost:8000/api/roll"  # Update if your server runs elsewhere
+API_URL = "https://dice.thecrazygm.com/api/roll"  # Update if your server runs elsewhere
 DB_URL = "sqlite:///dice_fairness.db"
 TABLE_NAME = "once_rolls"
 
