@@ -10,7 +10,7 @@ Example crontab entry (roll every minute):
 """
 
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 
 import dataset
 import requests
@@ -51,7 +51,7 @@ def main() -> None:
         # Insert record – roll_index is always 1 because this script only rolls once
         table.insert(
             {
-                "timestamp": datetime.utcnow().isoformat(timespec="seconds"),
+                "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
                 "dice_type": DICE_TYPE,
                 "dice_count": DICE_COUNT,
                 "modifier": MODIFIER,
