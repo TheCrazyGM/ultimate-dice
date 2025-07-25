@@ -5,9 +5,12 @@ description = "A modern fantasy-themed web app for provably fair dice rolling, w
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "dataset>=1.6.2",
     "flask>=3.1.1",
     "gunicorn>=23.0.0",
     "hive-nectar>=0.0.7",
+    "matplotlib>=3.10.3",
+    "numpy>=2.3.2",
     "pymongo>=4.13.0",
 ]
 

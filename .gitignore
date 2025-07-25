@@ -20,3 +20,9 @@ instance/
 node_modules/
 package-lock.json
 package.json
+dice_fairness.db
+dice_fairness.db-shm
+dice_fairness.db-wal
+fast_rolls_hist.png
+large_fast_rolls_hist.png
+slow_rolls_hist.png
