@@ -14,25 +14,34 @@ This script produces a figure with two panels:
 Usage:
     python plot_entropy_arc.py <table_name> [--db dice_fairness.db]
 
-Dependencies: matplotlib, sqlite3, numpy.
+Dependencies: matplotlib, dataset, numpy.
 """
 
 import argparse
-import sqlite3
 from collections import Counter
-from pathlib import Path
 from typing import List
+
+import dataset
 
 import matplotlib.pyplot as plt
 import numpy as np
+
+# Configuration matching other scripts
+DB_URL = "sqlite:///dice_fairness.db"
+TABLE_NAME = "large_fast_rolls"  # default table used when none provided
 
 # --------------------------- util functions ---------------------------------
 
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="Plot entropy arc for dice dataset")
-    p.add_argument("table", help="SQLite table containing roll data")
-    p.add_argument("--db", default="dice_fairness.db", help="SQLite database path")
+    p.add_argument(
+        "table",
+        nargs="?",
+        default=TABLE_NAME,
+        help=f"SQLite table containing roll data (default: {TABLE_NAME})",
+    )
+    p.add_argument("--db", default=DB_URL, help=f"SQLAlchemy DB URL (default: {DB_URL})")
     p.add_argument(
         "--outfile",
         default="entropy_arc.png",
@@ -41,16 +50,16 @@ def parse_args() -> argparse.Namespace:
     return p.parse_args()
 
 
-def fetch_faces(db_path: str, table: str) -> List[int]:
-    if not Path(db_path).is_file():
-        raise FileNotFoundError(db_path)
-    conn = sqlite3.connect(db_path)
-    try:
-        faces: List[int] = []
-        for (result_str,) in conn.execute(f"SELECT result FROM {table}"):
-            faces.extend(int(x) for x in result_str.split(",") if x)
-    finally:
-        conn.close()
+def fetch_faces(db_url: str, table: str) -> List[int]:
+    """Return flattened list of dice faces from a table using `dataset`."""
+    db = dataset.connect(db_url)
+    if table not in db:
+        raise ValueError(f"Table '{table}' not found in database.")
+
+    faces: List[int] = []
+    for row in db[table].all():
+        result_str = row.get("result") or ""
+        faces.extend(int(x) for x in result_str.split(",") if x)
     return faces
 
 

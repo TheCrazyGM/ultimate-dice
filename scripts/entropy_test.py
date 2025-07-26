@@ -28,7 +28,7 @@ import math
 from collections import Counter
 from typing import List
 
-import dataset  # same helper lib used in roll_* scripts
+import dataset
 
 # Configuration similar to roll_* scripts
 DB_URL = "sqlite:///dice_fairness.db"
