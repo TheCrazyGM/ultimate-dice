@@ -25,40 +25,46 @@ relative deviation may indicate bias.
 """
 import argparse
 import math
-import sqlite3
 from collections import Counter
-from pathlib import Path
 from typing import List
+
+import dataset  # same helper lib used in roll_* scripts
+
+# Configuration similar to roll_* scripts
+DB_URL = "sqlite:///dice_fairness.db"
+TABLE_NAME = "large_fast_rolls"  # default; can be overridden by CLI
 
 IDEAL_ENTROPY_BITS = math.log2(6)  # ≈ 2.585
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Shannon entropy test for dice datasets.")
-    parser.add_argument("table", help="SQLite table name containing roll data")
+    parser.add_argument(
+        "table",
+        nargs="?",
+        default=TABLE_NAME,
+        help=f"SQLite table name containing roll data (default: {TABLE_NAME})",
+    )
     parser.add_argument(
         "--db",
-        default="dice_fairness.db",
-        help="Path to SQLite database file (default: dice_fairness.db)",
+        default=DB_URL,
+        help=f"SQLAlchemy DB URL (default: {DB_URL})",
     )
     return parser.parse_args()
 
 
-def fetch_results(db_path: str, table: str) -> List[int]:
-    """Fetch and flatten dice faces from the specified table."""
-    if not Path(db_path).is_file():
-        raise FileNotFoundError(f"Database file '{db_path}' does not exist.")
+def fetch_results(db_url: str, table: str) -> List[int]:
+    """Fetch and flatten dice faces from the specified table using `dataset`."""
+    # dataset requires a proper URL: e.g., sqlite:///foo.db
+    db = dataset.connect(db_url)
+    if table not in db:
+        raise ValueError(f"Table '{table}' not found in database.")
 
-    conn = sqlite3.connect(db_path)
-    try:
-        cur = conn.execute(f"SELECT result FROM {table}")
-        faces: List[int] = []
-        for (result_str,) in cur:
-            # Each result is comma-separated (e.g., "3,5,1")
-            faces.extend(int(x) for x in result_str.split(",") if x)
-        return faces
-    finally:
-        conn.close()
+    faces: List[int] = []
+    for row in db[table].all():
+        result_str = row.get("result") or ""
+        faces.extend(int(x) for x in result_str.split(",") if x)
+    return faces
 
 
 def shannon_entropy(values: List[int]) -> float:
