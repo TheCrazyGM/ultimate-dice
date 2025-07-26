@@ -26,3 +26,4 @@ dice_fairness.db-wal
 fast_rolls_hist.png
 large_fast_rolls_hist.png
 slow_rolls_hist.png
+entropy_large_fast.png
