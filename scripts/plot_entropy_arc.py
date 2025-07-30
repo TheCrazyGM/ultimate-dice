@@ -22,7 +22,6 @@ from collections import Counter
 from typing import List
 
 import dataset
-
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -41,7 +40,9 @@ def parse_args() -> argparse.Namespace:
         default=TABLE_NAME,
         help=f"SQLite table containing roll data (default: {TABLE_NAME})",
     )
-    p.add_argument("--db", default=DB_URL, help=f"SQLAlchemy DB URL (default: {DB_URL})")
+    p.add_argument(
+        "--db", default=DB_URL, help=f"SQLAlchemy DB URL (default: {DB_URL})"
+    )
     p.add_argument(
         "--outfile",
         default="entropy_arc.png",

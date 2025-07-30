@@ -23,6 +23,7 @@ If the computed entropy is close to the ideal (within ~1-2%), the dataset can
 be considered high-entropy with respect to uniform dice faces. Larger
 relative deviation may indicate bias.
 """
+
 import argparse
 import math
 from collections import Counter
@@ -38,7 +39,9 @@ IDEAL_ENTROPY_BITS = math.log2(6)  # ≈ 2.585
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Shannon entropy test for dice datasets.")
+    parser = argparse.ArgumentParser(
+        description="Shannon entropy test for dice datasets."
+    )
     parser.add_argument(
         "table",
         nargs="?",
