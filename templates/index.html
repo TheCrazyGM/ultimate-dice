@@ -54,8 +54,8 @@
                 <td>
                   {{ roll.roll_result }} (Total:
                   {{
-                    roll.roll_result.split(',')|map('int')|sum +
-                    (roll.modifier or 0)
+                  roll.roll_result.split(',')|map('int')|sum +
+                  (roll.modifier or 0)
                   }})
                 </td>
                 <td>{{ roll.modifier }}</td>
@@ -196,9 +196,9 @@
           if (roll.roll_result) {
             total =
               roll.roll_result
-                .split(",")
-                .map((x) => parseInt(x))
-                .reduce((a, b) => a + b, 0) + (roll.modifier || 0);
+              .split(",")
+              .map((x) => parseInt(x))
+              .reduce((a, b) => a + b, 0) + (roll.modifier || 0);
           }
           return `
                 <tr>
@@ -253,10 +253,10 @@
             <b>${diceExpr}</b>
         </div>
         <div><b>Rolls:</b> [${summation}]${modifier !== 0 ? ` <b>Modifier:</b> ${modifier > 0 ? "+" : ""}${modifier}` : ""}</div>
-        <div><b>Total:</b> <span style="font-family: 'Fira Mono', monospace;">${total}</span></div>
-        <div><b>Proof:</b> <a href="/roll/${data.roll_id}">${data.proof.slice(0, 8)}...</a></div>
-    </div>
-`;
+          <div><b>Total:</b> <span style="font-family: 'Fira Mono', monospace;">${total}</span></div>
+          <div><b>Proof:</b> <a href="/roll/${data.roll_id}">${data.proof.slice(0, 8)}...</a></div>
+          </div>
+          `;
           await refreshRollsTable();
         } else {
           document.getElementById("result").innerHTML =
